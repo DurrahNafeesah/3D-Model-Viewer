@@ -87,22 +87,30 @@ app.get('/model/:id', async (req, res) => {
       contentType: model.contentType,
       dataSize: model.data.length
     });
+
+    // Set CORS headers
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
     
-    // Important: For binary files like GLB, set the correct content type
+    // Set caching headers
+    res.setHeader('Cache-Control', 'public, max-age=31536000');
+    res.setHeader('Last-Modified', model.uploadDate.toUTCString());
+    
+    // Set proper content type based on file extension
     if (model.name.toLowerCase().endsWith('.glb')) {
-      res.contentType('model/gltf-binary');
+      res.setHeader('Content-Type', 'model/gltf-binary');
       console.log('Setting content type: model/gltf-binary');
     } else if (model.name.toLowerCase().endsWith('.gltf')) {
-      res.contentType('model/gltf+json');
+      res.setHeader('Content-Type', 'model/gltf+json');
       console.log('Setting content type: model/gltf+json');
     } else {
-      res.contentType(model.contentType);
+      res.setHeader('Content-Type', model.contentType);
       console.log('Setting content type:', model.contentType);
     }
     
-    // Set cache control headers
-    res.setHeader('Cache-Control', 'public, max-age=31536000');
-    res.setHeader('Access-Control-Allow-Origin', '*');
+    // Set content length
+    res.setHeader('Content-Length', model.data.length);
     
     console.log('Sending model data...');
     res.send(model.data);
@@ -127,6 +135,15 @@ app.get('/models', async (req, res) => {
 // Home route
 app.get('/', (req, res) => {
   res.send('Welcome to the 3D Model API server! 🎉');
+});
+
+// Handle OPTIONS requests for CORS preflight
+app.options('/model/:id', (req, res) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Max-Age', '86400'); // 24 hours
+  res.status(204).end();
 });
 
 // Error handling middleware
