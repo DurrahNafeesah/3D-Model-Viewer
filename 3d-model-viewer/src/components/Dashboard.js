@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 
 export default function Dashboard({ setModelUrl }) {
   const [file, setFile] = useState(null);
@@ -6,14 +6,14 @@ export default function Dashboard({ setModelUrl }) {
   const [error, setError] = useState(null);
   const [modelId, setModelId] = useState(null);
 
-  const handleFileChange = (event) => {
+  const handleFileChange = useCallback((event) => {
     const selectedFile = event.target.files[0];
     console.log('Selected file:', selectedFile);
     setFile(selectedFile);
     setError(null); // Reset error on new file selection
-  };
+  }, []);
 
-  const handleSubmit = async (event) => {
+  const handleSubmit = useCallback(async (event) => {
     event.preventDefault();
     
     if (!file) {
@@ -59,7 +59,7 @@ export default function Dashboard({ setModelUrl }) {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [file, setModelUrl]);
 
   return (
     <div style={{ maxWidth: '500px', margin: '0 auto', padding: '20px' }}>
