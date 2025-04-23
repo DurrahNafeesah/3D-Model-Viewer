@@ -1,10 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import ModelViewer from './components/ModelViewer';
 import Dashboard from './components/Dashboard';
 import './App.css';
 
 function App() {
   const [modelUrl, setModelUrl] = useState('');
+
+  const handleModelUrlChange = useCallback((url) => {
+    setModelUrl(url);
+  }, []);
 
   return (
     <div className="App">
@@ -14,7 +18,7 @@ function App() {
       
       <main className="App-main">
         <div className="container">
-          <Dashboard setModelUrl={setModelUrl} />
+          <Dashboard setModelUrl={handleModelUrlChange} />
           
           <div className="viewer-container">
             <h2>Model Viewer</h2>
